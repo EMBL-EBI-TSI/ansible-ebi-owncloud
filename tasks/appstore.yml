@@ -1,0 +1,3 @@
+---
+- name: Configure app store
+  template: dest='{{owncloud_path}}/config/appstore.config.php' src=appstore.config.php.j2 mode=0640 owner='{{owncloud_user}}' group='{{owncloud_group}}'

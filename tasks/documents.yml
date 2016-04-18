@@ -1,0 +1,27 @@
+---
+- name: Install libreoffice
+  yum: name={{item}} state=present
+  with_items:
+    - libreoffice
+    - libreoffice-headless
+
+- block:
+    - name: Find documents configuration
+      command: php occ config:app:get documents {{item.key}}
+      args:
+        chdir: '{{owncloud_path}}'
+      with_dict:
+        converter: local
+      register: last
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Configure documents
+      command: php occ config:app:set documents {{item.item.key}} --value '{{item.item.value}}'
+      args:
+        chdir: '{{owncloud_path}}'
+      with_items: '{{last.results}}'
+      when: last|failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
+
+  become: yes
+  become_user: '{{owncloud_user}}'

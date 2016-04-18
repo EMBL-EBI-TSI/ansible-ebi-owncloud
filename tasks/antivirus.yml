@@ -1,0 +1,48 @@
+---
+- name: Install clamav
+  yum: name={{item}} state=present enablerepo=epel
+  with_items:
+    - clamav
+    - clamav-scanner
+    - clamav-scanner-systemd
+    - clamav-server
+    - clamav-server-systemd
+    - clamav-update
+
+- name: Activate freshclam and clamd scan
+  lineinfile: dest={{item}} regexp='^[#\s]*Example' line='# Example' state=present
+  with_items:
+    - /etc/freshclam.conf
+    - /etc/clamd.d/scan.conf
+
+- name: Configure clamd socket
+  lineinfile: dest=/etc/clamd.d/scan.conf regexp='^[#\s]*LocalSocket\s+' line='LocalSocket /var/run/clamd.scan/clamd.sock' state=present
+
+- name: Run freshclam once to update database
+  command: /bin/freshclam creates=/var/lib/clamav/bytecode.cvd
+
+- name: Set cron job for clamav
+  cron: name='freshclam' minute='4' job='/bin/freshclam --quiet'
+
+- name: Enable clamd service
+  service: name=clamd@scan state=started enabled=yes
+
+- block:
+    - name: Find files_antivirus configuration
+      command: php occ config:app:get files_antivirus {{item.key}}
+      args:
+        chdir: '{{owncloud_path}}'
+      with_dict: '{{owncloud_files_antivirus_config}}'
+      register: last
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Configure files_antivirus
+      command: php occ config:app:set files_antivirus {{item.item.key}} --value '{{item.item.value}}'
+      args:
+        chdir: '{{owncloud_path}}'
+      with_items: '{{last.results}}'
+      when: last|failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
+
+  become: yes
+  become_user: '{{owncloud_user}}'

@@ -1,0 +1,3 @@
+---
+- name: Configure memcache
+  template: dest='{{owncloud_path}}/config/memcache.config.php' src=memcache.config.php.j2 mode=0640 owner='{{owncloud_user}}' group='{{owncloud_group}}'

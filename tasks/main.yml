@@ -1,0 +1,40 @@
+---
+- name: Add repo
+  template: dest=/etc/yum.repos.d/ce:stable.repo src=repo.j2 mode=64
+
+- name: Add rpm key
+  get_url: dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-owncloud url=https://download.owncloud.org/download/repositories/stable/CentOS_7/repodata/repomd.xml.key mode=0644
+
+- name: Install package
+  yum: name={{item}} state=present enablerepo=ce_stable
+  with_items:
+    - owncloud-files
+
+- name: Make sure data directory exists
+  file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
+
+- name: Configure instance
+  command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-user 'root' --database-pass '{{mysql_root_password}}'
+  args:
+    chdir: '{{owncloud_path}}'
+    creates: config/config.php
+  become: yes
+  become_user: '{{owncloud_user}}'
+
+- include: fix_permissions.yml
+
+- include: memcache.yml
+
+- include: user_ldap.yml
+
+- include: background_jobs.yml
+
+- include: email_server.yml
+
+- include: logging.yml
+
+- include: antivirus.yml
+
+- include: appstore.yml
+
+- include: documents.yml

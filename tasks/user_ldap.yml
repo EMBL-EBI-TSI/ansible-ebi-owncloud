@@ -1,0 +1,60 @@
+---
+- name: Find if user_ldap is enabled
+  command: php occ config:app:get user_ldap enabled
+  args:
+    chdir: '{{owncloud_path}}'
+  register: is_owncloud_ldap_enabled
+  changed_when: false
+  ignore_errors: yes
+  become: yes
+  become_user: '{{owncloud_user}}'
+
+- block:
+    - name: Enable user_ldap
+      command: php occ app:enable user_ldap
+      args:
+        chdir: '{{owncloud_path}}'
+      when: is_owncloud_ldap_enabled|failed or is_owncloud_ldap_enabled.stdout_lines[0] == 'no'
+
+    - name: Find if user_ldap has been initialized
+      command: php occ ldap:show-config
+      args:
+        chdir: '{{owncloud_path}}'
+      register: last
+      changed_when: false
+
+    - name: Create empty user_ldap config
+      command: php occ ldap:create-empty-config
+      args:
+        chdir: '{{owncloud_path}}'
+      when: last.stdout == ''
+
+    - name: Find user_ldap configuration
+      command: php occ config:app:get user_ldap {{item.key}}
+      args:
+        chdir: '{{owncloud_path}}'
+      with_dict: '{{owncloud_user_ldap_config}}'
+      register: last
+      changed_when: false
+
+    - name: Configure user_ldap
+      command: php occ ldap:set-config '' {{item.item.value[0]}} '{{item.item.value[1]}}'
+      args:
+        chdir: '{{owncloud_path}}'
+      with_items: '{{last.results}}'
+      when: item.stdout == '' or item.stdout_lines[0] != item.item.value[1]
+
+  become: yes
+  become_user: '{{owncloud_user}}'
+  when: owncloud_user_ldap_config != {}
+
+- block:
+    - name: Disable user_ldap
+      command: php occ app:disable user_ldap
+      args:
+        chdir: '{{owncloud_path}}'
+      when: is_owncloud_ldap_enabled|failed or is_owncloud_ldap_enabled.stdout_lines[0] == 'yes'
+
+  become: yes
+  become_user: '{{owncloud_user}}'
+  when: owncloud_user_ldap_config == {}

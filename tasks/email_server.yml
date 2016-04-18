@@ -1,0 +1,8 @@
+---
+- name: Install sendmail dependency
+  yum: name={{item}} state=present
+  with_items:
+    - sendmail
+
+- name: Configure email server
+  template: dest='{{owncloud_path}}/config/mail.config.php' src=mail.config.php.j2 mode=0640 owner='{{owncloud_user}}' group='{{owncloud_group}}'

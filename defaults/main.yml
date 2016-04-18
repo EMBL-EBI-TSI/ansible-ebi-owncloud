@@ -1,0 +1,31 @@
+---
+# General
+owncloud_admin_email: root@localhost
+owncloud_path: /var/www/html/owncloud
+owncloud_data_path: /var/lib/owncloud
+owncloud_user: apache
+owncloud_group: apache
+owncloud_admin: admin
+owncloud_admin_pass: password
+
+# Database
+owncloud_db_type: mysql
+owncloud_db_name: owncloud
+owncloud_db_user: oc_admin
+owncloud_db_pass: password
+owncloud_db_host: localhost
+
+# Logging
+owncloud_log_backend: owncloud
+owncloud_log_timezone: UTC
+owncloud_log_level: 2
+owncloud_log_rotate_size: 524288000
+owncloud_log_timezone: UTC
+
+# App store
+owncloud_appstore_url: 'https://api.owncloud.com/v1'
+owncloud_appstore_experimantal_enabled: false
+
+# Misc apps
+owncloud_user_ldap_config: {}
+owncloud_files_antivirus_config: {}

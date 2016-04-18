@@ -1,0 +1,20 @@
+---
+- name: Set directory permissions
+  file: path={{owncloud_path}} mode=0750 owner=root group={{owncloud_group}}
+
+- name: Set directory permissions for web access
+  file: path={{owncloud_path}}/{{item}} owner={{owncloud_user}} group={{owncloud_group}} mode=0750 state=directory
+  with_items:
+    - apps
+    - config
+    - themes
+    - assets
+
+- name: Make occ executable
+  file: path={{owncloud_path}}/occ mode=0750
+
+- name: Protect .htaccess
+  file: path={{item}} owner=root group={{owncloud_group}} mode=0644
+  with_items:
+    - '{{owncloud_path}}/.htaccess'
+    - '{{owncloud_data_path}}/.htaccess'

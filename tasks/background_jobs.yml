@@ -1,0 +1,38 @@
+---
+- name: Install cron dependency
+  yum: name={{item}} state=present
+  with_items:
+    - cronie
+    - cronie-anacron
+    - crontabs
+
+- name: Set email destination for root cron jobs
+  lineinfile: dest={{item}} regexp='^MAILTO=' line='MAILTO={{owncloud_admin_email}}' create=yes
+  with_items:
+    - /etc/crontab
+    - /etc/anacrontab
+    - /var/spool/cron/root
+
+- name: Enable crond service
+  service: name=crond state=started enabled=yes
+
+- name: Add cron job
+  cron: name='Owncloud' user='{{owncloud_user}}' minute='*/15' job='php -f {{owncloud_path}}/cron.php' state=present
+
+- block:
+    - name: Find background mode
+      command: php occ config:app:get core backgroundjobs_mode
+      args:
+        chdir: '{{owncloud_path}}'
+      register: last
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Configure background mode
+      command: php occ background:cron
+      args:
+        chdir: '{{owncloud_path}}'
+      when: last|failed or last.stdout != 'cron'
+
+  become: yes
+  become_user: '{{owncloud_user}}'

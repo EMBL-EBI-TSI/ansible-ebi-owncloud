@@ -1,0 +1,3 @@
+---
+- name: Configure logging
+  template: dest='{{owncloud_path}}/config/logging.config.php' src=logging.config.php.j2 mode=0640 owner='{{owncloud_user}}' group='{{owncloud_group}}'
