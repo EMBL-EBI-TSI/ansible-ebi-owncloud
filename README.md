@@ -66,8 +66,10 @@ TODO
 ----
 - Select version to install.
 - Keep mailto=root and set an alias for root?
-- Better logic for running freshclam for the first time, or clamd service migh bail. Make a service? Or install cron packages.
+- Better logic for running freshclam for the first time, or clamd sefrvice migh bail. Make a service? Or install cron packages.
 - Move php dependencies to individual tasks?
+- Update basic options (admin_pass, admin_email, ...).
+- Activate calendar app?
 
 Licence
 -------
