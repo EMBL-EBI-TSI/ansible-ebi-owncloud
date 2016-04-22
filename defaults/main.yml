@@ -17,7 +17,6 @@ owncloud_db_host: localhost
 
 # Logging
 owncloud_log_backend: owncloud
-owncloud_log_timezone: UTC
 owncloud_log_level: 2
 owncloud_log_rotate_size: 524288000
 owncloud_log_timezone: UTC
