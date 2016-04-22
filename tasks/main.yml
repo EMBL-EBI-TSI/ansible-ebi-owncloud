@@ -14,7 +14,7 @@
   file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
 
 - name: Configure instance
-  command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-user 'root' --database-pass '{{mysql_root_password}}'
+  command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-host '{{owncloud_db_host}}' --database-user '{{owncloud_db_user}}' --database-pass '{{owncloud_db_pass}}'
   args:
     chdir: '{{owncloud_path}}'
     creates: config/config.php
