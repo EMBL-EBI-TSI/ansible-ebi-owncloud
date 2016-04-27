@@ -15,6 +15,8 @@ Following ownCloud features are configured automatically through the role:
 - ownCloud's main appstore is activated by default, but experimental apps are not enabled. See `owncloud_appstore_` variables for tweaks.
 - Collaborative editing of documents is enabled with a local LibreOffice setup. Note that you still need to manually activate the documents app from the app store.
 
+Multiple owncloud servers can be installed and configured. Only the first server in the list will be responsible for configuring the database and other options that depend on the `occ` command line tool.
+
 Requirements
 ------------
 See `meta/main.yml`.
@@ -70,6 +72,7 @@ TODO
 - Move php dependencies to individual tasks?
 - Update basic options (admin_pass, admin_email, ...).
 - Activate calendar app?
+- Abstract the list of servers, currently `owncloud-owncloud-servers` is used.
 
 Licence
 -------

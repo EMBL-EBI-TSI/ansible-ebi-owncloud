@@ -6,35 +6,54 @@
   get_url: dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-owncloud url=https://download.owncloud.org/download/repositories/stable/CentOS_7/repodata/repomd.xml.key mode=0644
 
 - name: Install package
-  yum: name={{item}} state=present enablerepo=ce_stable
-  with_items:
-    - owncloud-files
+  yum: name=owncloud-files state=present enablerepo=ce_stable
 
 - name: Make sure data directory exists
   file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
 
-- name: Configure instance
-  command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-host '{{owncloud_db_host}}' --database-user '{{owncloud_db_user}}' --database-pass '{{owncloud_db_pass}}'
+- name: Find owncloud version
+  command: php -r 'include "version.php"; echo join(".", $OC_Version);'
   args:
     chdir: '{{owncloud_path}}'
-    creates: config/config.php
-  become: yes
-  become_user: '{{owncloud_user}}'
+  register: owncloud_version
+  changed_when: false
 
-- include: fix_permissions.yml
+- name: Drop configuration file
+  template: dest={{owncloud_path}}/config/config.php src=config.php.j2 mode=0640 owner={{owncloud_user}} group={{owncloud_group}}
+
+- block:
+    - name: Check if owncloud has been initialized
+      stat: path={{owncloud_data_path}}/.ocdata
+      register: owncloud_is_init
+
+    - name: Mark instance not installed
+      lineinfile: dest={{owncloud_path}}/config/config.php regexp="^  'installed' =>" state=absent
+      when: not owncloud_is_init.stat.exists
+
+    - name: Initialize
+      command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-host '{{owncloud_db_host}}' --database-user '{{owncloud_db_user}}' --database-pass '{{owncloud_db_pass}}'
+      args:
+        chdir: '{{owncloud_path}}'
+      become: yes
+      become_user: '{{owncloud_user}}'
+      when: not owncloud_is_init.stat.exists
+  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+
+- include: user_ldap.yml
+  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
 
 - include: memcache.yml
 
-- include: user_ldap.yml
+- include: logging.yml
+
+- include: appstore.yml
 
 - include: background_jobs.yml
 
 - include: email_server.yml
 
-- include: logging.yml
-
 - include: antivirus.yml
 
-- include: appstore.yml
-
 - include: documents.yml
+
+- include: fix_permissions.yml

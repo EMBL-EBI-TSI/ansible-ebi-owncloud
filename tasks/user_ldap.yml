@@ -3,7 +3,7 @@
   command: php occ config:app:get user_ldap enabled
   args:
     chdir: '{{owncloud_path}}'
-  register: is_owncloud_ldap_enabled
+  register: owncloud_ldap_is_enabled
   changed_when: false
   ignore_errors: yes
   become: yes
@@ -14,7 +14,7 @@
       command: php occ app:enable user_ldap
       args:
         chdir: '{{owncloud_path}}'
-      when: is_owncloud_ldap_enabled|failed or is_owncloud_ldap_enabled.stdout_lines[0] == 'no'
+      when: owncloud_ldap_is_enabled|failed or owncloud_ldap_is_enabled.stdout_lines[0] == 'no'
 
     - name: Find if user_ldap has been initialized
       command: php occ ldap:show-config
@@ -53,7 +53,7 @@
       command: php occ app:disable user_ldap
       args:
         chdir: '{{owncloud_path}}'
-      when: is_owncloud_ldap_enabled|failed or is_owncloud_ldap_enabled.stdout_lines[0] == 'yes'
+      when: owncloud_ldap_is_enabled|failed or owncloud_ldap_is_enabled.stdout_lines[0] == 'yes'
 
   become: yes
   become_user: '{{owncloud_user}}'

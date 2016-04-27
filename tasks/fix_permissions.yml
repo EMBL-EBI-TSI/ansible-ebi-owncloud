@@ -1,9 +1,9 @@
 ---
 - name: Set directory permissions
-  file: path={{owncloud_path}} mode=0750 owner=root group={{owncloud_group}}
+  file: path={{owncloud_path}} state=directory owner=root group={{owncloud_group}} mode=0750
 
 - name: Set directory permissions for web access
-  file: path={{owncloud_path}}/{{item}} owner={{owncloud_user}} group={{owncloud_group}} mode=0750 state=directory
+  file: path={{owncloud_path}}/{{item}} state=directory owner={{owncloud_user}} group={{owncloud_group}} mode=0750
   with_items:
     - apps
     - config
@@ -11,10 +11,12 @@
     - assets
 
 - name: Make occ executable
-  file: path={{owncloud_path}}/occ mode=0750
+  file: path={{owncloud_path}}/occ state=file mode=0750
 
 - name: Protect .htaccess
-  file: path={{item}} owner=root group={{owncloud_group}} mode=0644
-  with_items:
-    - '{{owncloud_path}}/.htaccess'
-    - '{{owncloud_data_path}}/.htaccess'
+  file: path={{owncloud_path}}/.htaccess state=file owner=root group={{owncloud_group}} mode=0644
+
+- name: Protect data .htaccess
+  file: path={{owncloud_data_path}}/.htaccess state=file owner={{owncloud_group}} group={{owncloud_group}} mode=0644
+  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+  # TODO: owner should be root as per owncloud's recommendation, but that is troublesome while mounting nfs
