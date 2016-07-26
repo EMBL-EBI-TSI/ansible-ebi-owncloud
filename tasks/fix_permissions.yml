@@ -11,7 +11,7 @@
     - assets
 
 - name: Make occ executable
-  file: path={{owncloud_path}}/occ state=file mode=0750
+  file: path={{owncloud_path}}/occ state=file owner=root group=root mode=0750
 
 - name: Protect .htaccess
   file: path={{owncloud_path}}/.htaccess state=file owner=root group={{owncloud_group}} mode=0644
