@@ -1,12 +1,9 @@
 ---
 - name: Add repo
-  template: dest=/etc/yum.repos.d/ce:stable.repo src=repo.j2 mode=64
-
-- name: Add rpm key
-  get_url: dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-owncloud url=https://download.owncloud.org/download/repositories/stable/CentOS_7/repodata/repomd.xml.key mode=0644
+  yum_repository: name=ce-stable description='ownCloud Server Version stable (CentOS_7)' enabled=no baseurl=http://download.owncloud.org/download/repositories/stable/CentOS_7 gpgcheck=yes gpgkey=http://download.owncloud.org/download/repositories/stable/CentOS_7/repodata/repomd.xml.key state=present owner=root group=root mode=0644
 
 - name: Install package
-  yum: name=owncloud-files state=present enablerepo=ce_stable
+  yum: name=owncloud-files state=present enablerepo=ce-stable
 
 - name: Make sure data directory exists
   file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
