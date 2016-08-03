@@ -1,5 +1,6 @@
 ---
 # General
+owncloud_url: 'http://localhost/owncloud'
 owncloud_trusted_domains: [localhost]
 owncloud_admin_email: root@localhost
 owncloud_path: /var/www/html/owncloud

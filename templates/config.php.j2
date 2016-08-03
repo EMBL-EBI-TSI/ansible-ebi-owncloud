@@ -9,7 +9,9 @@ $CONFIG = array (
 {% endfor %}
   ),
   'datadirectory' => '{{owncloud_data_path}}',
-  'overwrite.cli.url' => 'http://localhost',
+  'overwriteprotocol' => '{{owncloud_url | regex_replace("(https?)://.*", "\\1")}}',
+  'overwrite.cli.url' => '{{owncloud_url}}',
+  'htaccess.RewriteBase' => '{{owncloud_url | regex_replace("^https?://[\w\d+-.]+(:[\d]+)?(.*)", "\\2") | regex_replace("/$", "")}}/',
   'dbtype' => '{{owncloud_db_type}}',
   'dbname' => '{{owncloud_db_name}}',
   'dbhost' => '{{owncloud_db_host}}',
