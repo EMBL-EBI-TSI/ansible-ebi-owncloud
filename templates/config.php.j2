@@ -3,9 +3,10 @@ $CONFIG = array (
   'updatechecker' => false,
   'passwordsalt' => 'AoTJ3NnNTcblAQFYQ77q++8zuCcY/O',
   'secret' => '8D4hpt/5AoWA51+7D2faFCFYmAS2Z6jyXe/KrGE7uGraCPBv',
-  'trusted_domains' =>
-  array (
-    0 => 'localhost',
+  'trusted_domains' => array (
+{% for domain in owncloud_trusted_domains %}
+    '{{domain}}',
+{% endfor %}
   ),
   'datadirectory' => '{{owncloud_data_path}}',
   'overwrite.cli.url' => 'http://localhost',
