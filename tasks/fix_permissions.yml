@@ -11,12 +11,14 @@
     - assets
 
 - name: Make occ executable
-  file: path={{owncloud_path}}/occ state=file owner=root group=root mode=0750
+  file: path={{owncloud_path}}/occ state=file owner=root group={{owncloud_group}} mode=0750
 
 - name: Protect .htaccess
   file: path={{owncloud_path}}/.htaccess state=file owner=root group={{owncloud_group}} mode=0644
 
 - name: Protect data .htaccess
   file: path={{owncloud_data_path}}/.htaccess state=file owner={{owncloud_group}} group={{owncloud_group}} mode=0644
+  become: yes
+  become_user: '{{owncloud_user}}'
   when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
   # TODO: owner should be root as per owncloud's recommendation, but that is troublesome while mounting nfs

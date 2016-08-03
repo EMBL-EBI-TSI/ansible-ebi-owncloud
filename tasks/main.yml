@@ -6,7 +6,9 @@
   yum: name=owncloud-files state=present enablerepo=ce-stable
 
 - name: Make sure data directory exists
-  file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
+  file: path='{{owncloud_data_path}}' state=directory mode=0750
+  become: yes
+  become_user: '{{owncloud_user}}'
 
 - name: Find owncloud version
   command: php -r 'include "version.php"; echo join(".", $OC_Version);'
@@ -22,6 +24,8 @@
     - name: Check if owncloud has been initialized
       stat: path={{owncloud_data_path}}/.ocdata
       register: owncloud_is_init
+      become: yes
+      become_user: '{{owncloud_user}}'
 
     - name: Mark instance not installed
       lineinfile: dest={{owncloud_path}}/config/config.php regexp="^  'installed' =>" state=absent
