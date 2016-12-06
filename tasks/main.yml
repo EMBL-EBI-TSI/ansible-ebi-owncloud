@@ -30,6 +30,7 @@
     chdir: '{{owncloud_path}}'
   register: owncloud_version
   changed_when: false
+  check_mode: no
 
 - name: Drop configuration file
   template: dest={{owncloud_path}}/config/config.php src=config.php.j2 mode=0640 owner={{owncloud_user}} group={{owncloud_group}}
