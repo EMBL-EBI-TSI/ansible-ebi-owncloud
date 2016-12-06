@@ -5,10 +5,24 @@
 - name: Install package
   yum: name=owncloud-files state=present enablerepo=ce-stable
 
-- name: Make sure data directory exists
+- name: Check if data directory is nfs mounted
+  command: stat --file-system --format=%T {{owncloud_data_path}}
+  changed_when: false
+  failed_when: false
+  check_mode: no
+  register: mount
+  become: yes
+  become_user: '{{owncloud_user}}'
+
+- name: Make sure data directory exists when it is nfs mounted
   file: path='{{owncloud_data_path}}' state=directory mode=0750
   become: yes
   become_user: '{{owncloud_user}}'
+  when: mount.stdout == 'nfs'
+
+- name: Make sure data directory exists when it is not nfs mounted
+  file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
+  when: mount.stdout != 'nfs'
 
 - name: Find owncloud version
   command: php -r 'include "version.php"; echo join(".", $OC_Version);'
