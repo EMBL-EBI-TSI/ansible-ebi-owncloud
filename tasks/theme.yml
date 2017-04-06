@@ -1,0 +1,35 @@
+---
+- name: Find current theme
+  command: php occ config:system:get theme
+  args:
+    chdir: '{{owncloud_path}}'
+  register: current_theme
+  changed_when: false
+  ignore_errors: yes
+  become: yes
+  become_user: '{{owncloud_user}}'
+
+- block:
+    - name: Add custom theme to config
+      command: php occ config:system:set theme --value {{owncloud_theme_name}}
+      args:
+        chdir: '{{owncloud_path}}'
+      when: current_theme | failed or current_theme.stdout != owncloud_theme_name
+      become: yes
+      become_user: '{{owncloud_user}}'
+
+    - name: Install git dependency
+      yum: name=git state=present
+
+    - name: Drop theme
+      git: repo='{{owncloud_theme_repo}}' dest='{{owncloud_path}}/themes/{{owncloud_theme_name}}' umask=0022
+
+  when: owncloud_theme_name | default()
+
+- name: Delete custom theme from config
+  command: php occ config:system:delete theme
+  args:
+    chdir: '{{owncloud_path}}'
+  become: yes
+  become_user: '{{owncloud_user}}'
+  when: not (owncloud_theme_name | default())

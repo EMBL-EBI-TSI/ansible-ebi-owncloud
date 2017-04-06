@@ -10,6 +10,10 @@ owncloud_group: apache
 owncloud_admin: admin
 owncloud_admin_pass: password
 
+# Theme
+owncloud_theme_name:
+owncloud_theme_repo:
+
 # Database
 owncloud_db_type: mysql
 owncloud_db_name: owncloud

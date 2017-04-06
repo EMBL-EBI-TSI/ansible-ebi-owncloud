@@ -62,6 +62,8 @@
 
 - include: logging.yml
 
+- include: theme.yml
+
 - include: appstore.yml
 
 - include: background_jobs.yml
