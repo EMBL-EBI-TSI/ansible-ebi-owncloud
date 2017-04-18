@@ -17,6 +17,8 @@ Following ownCloud features are configured automatically through the role:
 
 Multiple owncloud servers can be installed and configured. Only the first server in the list will be responsible for configuring the database and other options that depend on the `occ` command line tool.
 
+A custom theme can be optionally deployed to the application servers from a git repository. Use `owncloud_theme_name` to specify the name of the folder inside the themes directory and `owncloud_theme_repo` to point to the git repository with the theme code.
+
 Requirements
 ------------
 See `meta/main.yml`.
