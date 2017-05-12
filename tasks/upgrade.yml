@@ -1,0 +1,32 @@
+---
+- name: Update package
+  yum: name=owncloud-files state=latest enablerepo=ce-stable update_cache=yes
+  tags: upgrade
+
+- name: Enable maintenance mode
+  command: php occ maintenance:mode --on
+  args:
+    chdir: '{{owncloud_path}}'
+  become: yes
+  become_user: '{{owncloud_user}}'
+  tags: upgrade
+
+- name: Backup config
+  archive: dest='/tmp/{{ansible_hostname}}_{{ansible_date_time.iso8601}}_config.tgz' path={{owncloud_path}}/config
+  tags: upgrade
+
+- name: Upgrade owncloud
+  command: php occ upgrade
+  args:
+    chdir: '{{owncloud_path}}'
+  become: yes
+  become_user: '{{owncloud_user}}'
+  tags: upgrade
+
+- name: Disable maintenance mode
+  command: php occ maintenance:mode --off
+  args:
+    chdir: '{{owncloud_path}}'
+  become: yes
+  become_user: '{{owncloud_user}}'
+  tags: upgrade
