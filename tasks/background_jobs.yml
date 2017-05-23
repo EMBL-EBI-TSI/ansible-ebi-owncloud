@@ -25,7 +25,7 @@
       command: php occ config:app:get core backgroundjobs_mode
       args:
         chdir: '{{owncloud_path}}'
-      register: last
+      register: owncloud__r_bgmode
       changed_when: false
       ignore_errors: yes
 
@@ -33,7 +33,7 @@
       command: php occ background:cron
       args:
         chdir: '{{owncloud_path}}'
-      when: last|failed or last.stdout != 'cron'
+      when: owncloud__r_bgmode | failed or owncloud__r_bgmode.stdout != 'cron'
 
   become: yes
   become_user: '{{owncloud_user}}'

@@ -10,7 +10,7 @@
   changed_when: false
   failed_when: false
   check_mode: no
-  register: mount
+  register: owncloud__r_mount
   become: yes
   become_user: '{{owncloud_user}}'
 
@@ -18,17 +18,17 @@
   file: path='{{owncloud_data_path}}' state=directory mode=0750
   become: yes
   become_user: '{{owncloud_user}}'
-  when: mount.stdout == 'nfs'
+  when: owncloud__r_mount.stdout == 'nfs'
 
 - name: Make sure data directory exists when it is not nfs mounted
   file: path='{{owncloud_data_path}}' state=directory mode=0750 owner={{owncloud_user}} group={{owncloud_group}}
-  when: mount.stdout != 'nfs'
+  when: owncloud__r_mount.stdout != 'nfs'
 
 - name: Find owncloud version
   command: php -r 'include "version.php"; echo join(".", $OC_Version);'
   args:
     chdir: '{{owncloud_path}}'
-  register: owncloud_version
+  register: owncloud__r_version
   changed_when: false
   check_mode: no
 
@@ -38,13 +38,13 @@
 - block:
     - name: Check if owncloud has been initialized
       stat: path={{owncloud_data_path}}/.ocdata
-      register: owncloud_is_init
+      register: owncloud__r_init
       become: yes
       become_user: '{{owncloud_user}}'
 
     - name: Mark instance not installed
       lineinfile: dest={{owncloud_path}}/config/config.php regexp="^  'installed' =>" state=absent
-      when: not owncloud_is_init.stat.exists
+      when: not owncloud__r_init.stat.exists
 
     - name: Initialize
       command: php occ maintenance:install --data-dir='{{owncloud_data_path}}' --admin-user '{{owncloud_admin}}' --admin-pass '{{owncloud_admin_pass}}' --database '{{owncloud_db_type}}' --database-name '{{owncloud_db_name}}' --database-host '{{owncloud_db_host}}' --database-user '{{owncloud_db_user}}' --database-pass '{{owncloud_db_pass}}'
@@ -52,7 +52,7 @@
         chdir: '{{owncloud_path}}'
       become: yes
       become_user: '{{owncloud_user}}'
-      when: not owncloud_is_init.stat.exists
+      when: not owncloud__r_init.stat.exists
   when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
 
 - include: user_ldap.yml

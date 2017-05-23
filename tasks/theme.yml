@@ -3,7 +3,7 @@
   command: php occ config:system:get theme
   args:
     chdir: '{{owncloud_path}}'
-  register: current_theme
+  register: owncloud__r_theme
   changed_when: false
   ignore_errors: yes
   become: yes
@@ -14,7 +14,7 @@
       command: php occ config:system:set theme --value {{owncloud_theme_name}}
       args:
         chdir: '{{owncloud_path}}'
-      when: current_theme | failed or current_theme.stdout != owncloud_theme_name
+      when: owncloud__r_theme | failed or owncloud__r_theme.stdout != owncloud_theme_name
       become: yes
       become_user: '{{owncloud_user}}'
 

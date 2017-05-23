@@ -33,7 +33,7 @@
       args:
         chdir: '{{owncloud_path}}'
       with_dict: '{{owncloud_files_antivirus_config}}'
-      register: last
+      register: owncloud__r_av
       changed_when: false
       ignore_errors: yes
 
@@ -41,8 +41,8 @@
       command: php occ config:app:set files_antivirus {{item.item.key}} --value '{{item.item.value}}'
       args:
         chdir: '{{owncloud_path}}'
-      with_items: '{{last.results}}'
-      when: last|failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
+      with_items: '{{owncloud__r_av.results}}'
+      when: owncloud__r_av | failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
 
   become: yes
   become_user: '{{owncloud_user}}'

@@ -12,7 +12,7 @@
         chdir: '{{owncloud_path}}'
       with_dict:
         converter: local
-      register: last
+      register: owncloud__r_docs
       changed_when: false
       ignore_errors: yes
 
@@ -20,8 +20,8 @@
       command: php occ config:app:set documents {{item.item.key}} --value '{{item.item.value}}'
       args:
         chdir: '{{owncloud_path}}'
-      with_items: '{{last.results}}'
-      when: last|failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
+      with_items: '{{owncloud__r_docs.results}}'
+      when: owncloud__r_docs | failed or item.stdout == '' or item.stdout_lines[0] != item.item.value
 
   become: yes
   become_user: '{{owncloud_user}}'

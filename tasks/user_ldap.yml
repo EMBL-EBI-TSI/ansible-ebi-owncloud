@@ -3,7 +3,7 @@
   command: php occ config:app:get user_ldap enabled
   args:
     chdir: '{{owncloud_path}}'
-  register: owncloud_ldap_is_enabled
+  register: owncloud__r_ldap
   changed_when: false
   ignore_errors: yes
   become: yes
@@ -14,34 +14,34 @@
       command: php occ app:enable user_ldap
       args:
         chdir: '{{owncloud_path}}'
-      when: owncloud_ldap_is_enabled|failed or owncloud_ldap_is_enabled.stdout_lines[0] == 'no'
+      when: owncloud__r_ldap | failed or owncloud__r_ldap.stdout_lines[0] == 'no'
 
     - name: Find if user_ldap has been initialized
       command: php occ ldap:show-config
       args:
         chdir: '{{owncloud_path}}'
-      register: last
+      register: owncloud__r_user_init
       changed_when: false
 
     - name: Create empty user_ldap config
       command: php occ ldap:create-empty-config
       args:
         chdir: '{{owncloud_path}}'
-      when: last.stdout == ''
+      when: owncloud__r_user_init.stdout == ''
 
     - name: Find user_ldap configuration
       command: php occ config:app:get user_ldap {{item.key}}
       args:
         chdir: '{{owncloud_path}}'
       with_dict: '{{owncloud_user_ldap_config}}'
-      register: last
+      register: owncloud__r_user
       changed_when: false
 
     - name: Configure user_ldap
       command: php occ ldap:set-config '' {{item.item.value[0]}} '{{item.item.value[1]}}'
       args:
         chdir: '{{owncloud_path}}'
-      with_items: '{{last.results}}'
+      with_items: '{{owncloud__r_user.results}}'
       when: item.stdout == '' or item.stdout_lines[0] != item.item.value[1]
 
   become: yes
@@ -53,7 +53,7 @@
       command: php occ app:disable user_ldap
       args:
         chdir: '{{owncloud_path}}'
-      when: owncloud_ldap_is_enabled|failed or owncloud_ldap_is_enabled.stdout_lines[0] == 'yes'
+      when: owncloud__r_ldap | failed or owncloud__r_ldap.stdout_lines[0] == 'yes'
 
   become: yes
   become_user: '{{owncloud_user}}'
