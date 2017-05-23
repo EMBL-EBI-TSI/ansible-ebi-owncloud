@@ -82,4 +82,4 @@ Licensed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 Author Information
 ------------------
-Luis Gracia <luis.gracia@ebi.ac.uk>
+Luis Gracia <luis.gracia@ebi.ac.uk> [luisico](https://github.com/luisico)
