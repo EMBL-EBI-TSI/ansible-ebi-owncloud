@@ -19,7 +19,7 @@
   lineinfile: dest=/etc/clamd.d/scan.conf regexp='^[#\s]*LocalSocket\s+' line='LocalSocket /var/run/clamd.scan/clamd.sock' state=present
 
 - name: Run freshclam once to update database
-  command: /bin/freshclam creates=/var/lib/clamav/bytecode.cvd
+  command: /bin/freshclam creates=/var/lib/clamav/bytecode.cld
 
 - name: Set cron job for clamav
   cron: name='freshclam' minute='4' job='/bin/freshclam --quiet'
