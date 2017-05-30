@@ -11,12 +11,8 @@
 
 - block:
     - name: Add custom theme to config
-      command: php occ config:system:set theme --value {{owncloud_theme_name}}
-      args:
-        chdir: '{{owncloud_path}}'
+      template: dest={{owncloud_path}}/config/theme.config.php src=theme.config.php.j2 mode=0640 owner={{owncloud_user}} group={{owncloud_group}}
       when: owncloud__r_theme | failed or owncloud__r_theme.stdout != owncloud_theme_name
-      become: yes
-      become_user: '{{owncloud_user}}'
 
     - name: Install git dependency
       yum: name=git state=present
@@ -27,9 +23,5 @@
   when: owncloud_theme_name | default()
 
 - name: Delete custom theme from config
-  command: php occ config:system:delete theme
-  args:
-    chdir: '{{owncloud_path}}'
-  become: yes
-  become_user: '{{owncloud_user}}'
+  file: path={{owncloud_path}}/config/theme.config.php state=absent
   when: not (owncloud_theme_name | default())
