@@ -27,6 +27,9 @@ Role Variables
 --------------
 See `defaults/main.yml`.
 
+### MySQL database
+MySQL is also needed to hold the database.
+
 ### LDAP configuration
 All LDAP configuration is stored inside the `owncloud_user_ldap_config` hash, which is empty by default, therefore disabling LDAP. Any variable understood by `occ ldap:set-config` can be included in the hash. Because the need to retrieve values from `occ` to make the role idempotent and the difference in syntax between `occ config:app:get user_ldap` and `occ ldap:set-config`, each element in the hash has the following format:
 ```
@@ -55,7 +58,9 @@ Note that you still need to manually activate the antivirus app from the app sto
 
 Dependencies
 ------------
-None on this role, but a webserver, php and a database should be pre-installed before applying this role.
+Owncloud depends on apache+php pre-install on the application servers. Using roles `geerlingguy.apache`, `geerlingguy.repo-epel`, `geerlingguy.repo-remi` and `geerlingguy.php` before this roles is sufficient (see example below).
+
+An NFS server is needed if more than one application server is deployed. `nfs` can be used in `client_mode` to point to the NFS server mounts.
 
 Example Playbook
 ----------------
@@ -63,6 +68,11 @@ Example:
 ```
 - hosts: servers
   roles:
+    - geerlingguy.apache
+    - geerlingguy.repo-epel
+    - geerlingguy.repo-remi
+    - geerlingguy.php
+    - {role: nfs, nfs_mode: client}
     - owncloud
 ```
 
@@ -70,11 +80,10 @@ TODO
 ----
 - Select version to install.
 - Keep mailto=root and set an alias for root?
-- Better logic for running freshclam for the first time, or clamd sefrvice migh bail. Make a service? Or install cron packages.
-- Move php dependencies to individual tasks?
-- Update basic options (admin_pass, admin_email, ...).
-- Activate calendar app?
+- Better logic for running freshclam for the first time, or clamd service might bail out. Make a service? Or install cron packages.
+- Some options are not updated (ie admin_pass, admin_email).
 - Abstract the list of servers, currently `owncloud-owncloud-servers` is used.
+- Full playbook example, including haproxy, mysql, nfs server...
 
 Licence
 -------
