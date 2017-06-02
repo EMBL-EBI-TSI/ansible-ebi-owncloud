@@ -10,6 +10,9 @@ owncloud_group: apache
 owncloud_admin: admin
 owncloud_admin_pass: password
 
+# List of application servers
+owncloud_app_servers: [localhost]
+
 # Theme
 owncloud_theme_name:
 owncloud_theme_repo:

@@ -53,10 +53,10 @@
       become: yes
       become_user: '{{owncloud_user}}'
       when: not owncloud__r_init.stat.exists
-  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+  when: hostvars[owncloud_app_servers[0]].ansible_fqdn == ansible_fqdn
 
 - include: user_ldap.yml
-  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+  when: hostvars[owncloud_app_servers[0]].ansible_fqdn == ansible_fqdn
 
 - include: memcache.yml
 

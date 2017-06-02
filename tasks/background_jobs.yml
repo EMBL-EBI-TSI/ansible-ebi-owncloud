@@ -18,7 +18,7 @@
 
 - name: Add cron job
   cron: name='Owncloud' user='{{owncloud_user}}' minute='*/15' job='php -f {{owncloud_path}}/cron.php' state=present
-  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+  when: hostvars[owncloud_app_servers[0]].ansible_fqdn == ansible_fqdn
 
 - block:
     - name: Find background mode
@@ -37,4 +37,4 @@
 
   become: yes
   become_user: '{{owncloud_user}}'
-  when: hostvars[groups['owncloud-owncloud-servers'][0]].ansible_fqdn == ansible_fqdn
+  when: hostvars[owncloud_app_servers[0]].ansible_fqdn == ansible_fqdn

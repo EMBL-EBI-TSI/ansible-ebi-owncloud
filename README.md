@@ -15,7 +15,7 @@ Following ownCloud features are configured automatically through the role:
 - ownCloud's main appstore is activated by default, but experimental apps are not enabled. See `owncloud_appstore_` variables for tweaks.
 - Collaborative editing of documents is enabled with a local LibreOffice setup. Note that you still need to manually activate the documents app from the app store.
 
-Multiple owncloud servers can be installed and configured. Only the first server in the list will be responsible for configuring the database and other options that depend on the `occ` command line tool.
+Multiple owncloud servers can be installed and configured. Only the first server in the list will be responsible for configuring the database and other options that depend on the `occ` command line tool. You must set the list of owncloud application servers in `owncloud_app_servers`, for example to a group listed in the inventory (ie `owncloud_app_servers: '{{groups["owncloud-owncloud-servers"]}}'`).
 
 A custom theme can be optionally deployed to the application servers from a git repository. Use `owncloud_theme_name` to specify the name of the folder inside the themes directory and `owncloud_theme_repo` to point to the git repository with the theme code.
 
@@ -26,9 +26,6 @@ See `meta/main.yml`.
 Role Variables
 --------------
 See `defaults/main.yml`.
-
-### MySQL database
-MySQL is also needed to hold the database.
 
 ### LDAP configuration
 All LDAP configuration is stored inside the `owncloud_user_ldap_config` hash, which is empty by default, therefore disabling LDAP. Any variable understood by `occ ldap:set-config` can be included in the hash. Because the need to retrieve values from `occ` to make the role idempotent and the difference in syntax between `occ config:app:get user_ldap` and `occ ldap:set-config`, each element in the hash has the following format:
@@ -82,7 +79,6 @@ TODO
 - Keep mailto=root and set an alias for root?
 - Better logic for running freshclam for the first time, or clamd service might bail out. Make a service? Or install cron packages.
 - Some options are not updated (ie admin_pass, admin_email).
-- Abstract the list of servers, currently `owncloud-owncloud-servers` is used.
 - Full playbook example, including haproxy, mysql, nfs server...
 
 Licence
