@@ -82,4 +82,7 @@ Licensed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 Author Information
 ------------------
-Luis Gracia <luis.gracia@ebi.ac.uk> [luisico](https://github.com/luisico)
+Luis Gracia while at [EMBL-EBI](http://www.ebi.ac.uk/):
+- luis.gracia [at] ebi.ac.uk
+- GitHub at [luisico](https://github.com/luisico)
+- Galaxy at [luisico](https://galaxy.ansible.com/luisico)
